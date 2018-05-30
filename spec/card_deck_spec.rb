@@ -31,6 +31,8 @@ describe '#war?' do
     expect(deck.cards[1]).to_not(eq(1))
   end
   it 'should return an array of two decks' do
-
+    deck = CardDeck.new()
+    both_decks = deck.split_to_two_decks.to_a
+    expect(both_decks[0].size).to eq (deck.cards_left? / 2)
   end
 end

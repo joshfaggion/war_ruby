@@ -28,4 +28,8 @@ class CardDeck
   def shuffle
     @cards.shuffle!
   end
+
+  def split_to_two_decks
+    @cards.each_slice(@cards.length / 2).to_a
+  end
 end
