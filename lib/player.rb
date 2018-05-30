@@ -3,7 +3,10 @@ class Player
     @deck = deck[pos]
   end
 
-  def cards_left?
+  def set_hand
+  end
+
+  def cards_left
     @deck.length
   end
 

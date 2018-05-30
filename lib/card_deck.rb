@@ -13,11 +13,7 @@ class CardDeck
     end
   end
 
-  def cards
-    @cards
-  end
-
-  def cards_left?
+  def cards_left
     @cards.length
   end
 

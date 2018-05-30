@@ -2,6 +2,8 @@ require('player')
 
 
 class Game
+  attr_reader :player_one, :player_two
+  
   def initialize()
     @deck = CardDeck.new().split_to_two_decks
     @deck.shuffle

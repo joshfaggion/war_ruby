@@ -6,7 +6,7 @@ describe '#player?' do
     player_one_deck = CardDeck.new().split_to_two_decks
     player_one_deck.shuffle
     player = Player.new(player_one_deck, 0)
-    expect(player.cards_left?).to eq (26)
+    expect(player.cards_left).to eq (26)
   end
   it 'should be able to take two cards and increase its deck' do
     player_deck = CardDeck.new().split_to_two_decks
@@ -21,6 +21,6 @@ describe '#player?' do
     player_deck.shuffle
     player = Player.new(player_deck, 0)
     player.play
-    expect(player.cards_left?).to eq (25)
+    expect(player.cards_left).to eq (25)
   end
 end
