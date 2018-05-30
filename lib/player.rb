@@ -1,6 +1,6 @@
 class Player
-  def initialize (deck)
-    @deck = deck[0]
+  def initialize (deck, pos)
+    @deck = deck[pos]
   end
 
   def cards_left?
@@ -10,7 +10,7 @@ class Player
   def take_winning (cards_won)
     @deck.push(cards_won)
   end
-  
+
   def play
     @deck.pop
   end

@@ -1,15 +1,33 @@
+require('player')
+
 
 class Game
-  def initialize(deck)
-    @deck = deck
+  def initialize()
+    @deck = CardDeck.new().split_to_two_decks
+    @deck.shuffle
+    @player_one = Player.new(@deck, 0)
+    @player_two = Player.new(@deck, 1)
+    @prizepool = []
   end
-  def evaluate_winner(original_card, opposing_card)
-    if original_card == opposing_card
-      evaluate_winner(@deck.deal, @deck.deal)
-    elsif original_card > opposing_card
-      "The original card was victorious!"
-    else
-      "The opposing card was victorious!"
+
+  def run_round
+    card_one = @player_one.play
+    card_two = @player_two.play
+    @prizepool.push(card_one, card_two)
+    if card_one > card_two
+      @player_one.take_winning(@prizepool)
+    elsif card_two > card_one
+      @player_two.take_winning(@prizepool)
+    elsif card_one == card_two
+
     end
+  end
+
+  def player_one
+    @player_one
+  end
+
+  def player_two
+    @player_two
   end
 end
