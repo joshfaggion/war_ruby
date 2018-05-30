@@ -2,7 +2,7 @@ require('rspec')
 require('card_deck')
 require('pry')
 
-describe '#war?' do
+describe '#card_decl?' do
   it('should start the deck with 52 cards') do
     deck = CardDeck.new()
     expect(deck.cards_left?).to(eq(52))
