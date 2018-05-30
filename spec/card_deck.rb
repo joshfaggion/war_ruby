@@ -28,7 +28,7 @@ describe '#war?' do
   it('should change the location of the first item') do
     deck = CardDeck.new()
     deck.shuffle()
-    expect(deck.cards[1]).to_not(eq("Ace of Hearts"))
+    expect(deck.cards[1]).to_not(eq(1))
   end
   it('should return that the opposing card won that round') do
     deck = CardDeck.new()
