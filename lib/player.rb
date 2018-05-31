@@ -1,17 +1,16 @@
 class Player
-  def initialize (deck, pos)
-    @deck = deck[pos]
-  end
-
-  def set_hand
+  attr_reader :deck
+  
+  def set_hand(deck)
+    @deck = deck
   end
 
   def cards_left
     @deck.length
   end
 
-  def take_winning (cards_won)
-    @deck.push(cards_won)
+  def take_winning (winnings)
+    @deck.push(winnings)
   end
 
   def play

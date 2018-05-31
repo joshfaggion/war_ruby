@@ -34,6 +34,7 @@ describe '#card_deck?' do
   it 'should return an array of two decks' do
     deck = CardDeck.new()
     both_decks = deck.split_to_two_decks.to_a
-    expect(both_decks[0].size).to eq (deck.cards_left / 2)
+    first_deck = 0
+    expect(both_decks[first_deck].size).to eq (deck.cards_left / 2)
   end
 end
