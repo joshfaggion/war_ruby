@@ -28,12 +28,4 @@ class Game
 
     end
   end
-
-  def player_one
-    @player_one
-  end
-
-  def player_two
-    @player_two
-  end
 end
