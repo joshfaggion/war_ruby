@@ -1,4 +1,5 @@
 require('pry')
+require_relative('playing_card')
 
 class CardDeck
   def initialize
@@ -26,6 +27,7 @@ class CardDeck
   end
 
   def split_to_two_decks
-    @cards.each_slice(@cards.length / 2).to_a
+    new_decks = @cards.each_slice(@cards.length / 2).to_a
+    new_decks
   end
 end
