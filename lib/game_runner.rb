@@ -8,4 +8,5 @@ until war.winner == true do
   puts "#{war.run_round(false)}"
 end
 
+puts "Getting results..."
 puts "Winner: #{war.game_winner}"

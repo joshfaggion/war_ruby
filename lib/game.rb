@@ -59,10 +59,10 @@ class Game
   end
 
   def winner
-    if @player_one.cards_left < 1
+    if @player_one.cards_left <= 1
       @game_winner = "Player Two!"
       return true
-    elsif @player_two.cards_left < 1
+    elsif @player_two.cards_left <= 1
       @game_winner = "Player One!"
       return true
     else
