@@ -1,6 +1,6 @@
 class Player
   attr_reader :deck
-  
+
   def set_hand(deck)
     @deck = deck
   end
@@ -14,6 +14,6 @@ class Player
   end
 
   def play
-    @deck.pop
+    @deck.shift
   end
 end
