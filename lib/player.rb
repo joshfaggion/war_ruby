@@ -10,6 +10,7 @@ class Player
   end
 
   def take_winning (winnings)
+    winnings.shuffle!
     winnings.each do |i|
       @deck.push(i)
     end
@@ -17,8 +18,5 @@ class Player
 
   def play
     @deck.shift
-  end
-  def shuffle_hand
-    @deck.shuffle!
   end
 end

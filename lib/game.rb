@@ -66,8 +66,6 @@ class Game
       @game_winner = "Player One!"
       return true
     else
-      @player_one.shuffle_hand
-      @player_two.shuffle_hand
       return false
     end
   end
