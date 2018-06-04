@@ -27,10 +27,11 @@ class Game
     if card_one.value > card_two.value
 
       if (tie == true)
-        @player_one.take_winning(@prizepool)
         tmp = @prizepool
+        cards = tmp
+        @player_one.take_winning(@prizepool)
         @prizepool = []
-        return "Player One used the #{tmp[tmp.size - 2].rank} of #{tmp[tmp.size - 2].suit} to win a war and take the prizepool!"
+        return "Player One used the #{cards[cards.size - 2].rank} of #{cards[cards.size - 2].suit} to win a war and take the prizepool!"
 
       else
         @player_one.take_winning(@prizepool)
@@ -41,10 +42,10 @@ class Game
     elsif card_two.value > card_one.value
 
       if (tie == true)
+        cards  = @prizepool
         @player_two.take_winning(@prizepool)
-        tmp = @prizepool
         @prizepool = []
-        return "Player Two used the #{tmp[tmp.size - 2].rank} of #{tmp[tmp.size - 2].suit} to win a war and take the prizepool!"
+        return "Player Two used the #{cards[cards.size - 2].rank} of #{cards[cards.size - 2].suit} to win a war and take the prizepool!"
 
       else
         @player_two.take_winning(@prizepool)
@@ -52,7 +53,7 @@ class Game
         return "Player Two took the #{card_one.rank} of #{card_one.suit}, and the #{card_two.rank} of #{card_two.suit}!"
       end
 
-    elsif card_one.value == card_two.value
+    else
       run_round(true)
     end
 
@@ -61,12 +62,12 @@ class Game
   def winner
     if @player_one.cards_left <= 1
       @game_winner = "Player Two!"
-      return true
+      true
     elsif @player_two.cards_left <= 1
       @game_winner = "Player One!"
-      return true
+      true
     else
-      return false
+      false
     end
   end
 end
