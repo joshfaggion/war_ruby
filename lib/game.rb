@@ -55,14 +55,13 @@ class Game
     else
       run_round(true, prizepool)
     end
-
   end
 
   def winner
-    if @player_one.cards_left <= 1
+    if @player_one.cards_left < 1
       @game_winner = "Player Two!"
       true
-    elsif @player_two.cards_left <= 1
+    elsif @player_two.cards_left < 1
       @game_winner = "Player One!"
       true
     else
