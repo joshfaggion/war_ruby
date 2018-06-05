@@ -12,7 +12,7 @@ class MockSocketClient
     @socket.puts(input)
   end
 
-  def take_in_output(delay=0.01)
+  def take_in_output(delay=0.4)
     sleep(delay)
     @output = @socket.read_nonblock(2999)
   rescue IO::WaitReadable
@@ -51,7 +51,6 @@ describe '#socket_server' do
     client2 = MockSocketClient.new(@server.port_number)
     @clients.push(client2)
     @server.accept_new_client("Player 2")
-    binding.pry
     @server.create_game_if_possible
     expect(@server.games.count).to be 1
   end
@@ -67,5 +66,24 @@ describe '#socket_server' do
     @server.accept_new_client("Player 2")
     @server.prepare_player()
     expect(client1.take_in_output.chomp).to eq "Prepare for war, my lord!"
+    expect(client2.take_in_output.chomp).to eq "Prepare for war, my lord!"
   end
+    #  Make sure the next round isn't played until both clients say they are ready to play
+  it 'should say the game is not ready to be played until set to be ready' do
+    @server.start
+    client1 = MockSocketClient.new(@server.port_number)
+    @clients.push(client1)
+    @server.accept_new_client("Player 1")
+    @server.create_game_if_possible
+    client2 = MockSocketClient.new(@server.port_number)
+    @clients.push(client2)
+    @server.accept_new_client("Player 2")
+    @server.prepare_player
+    @server.create_game_if_possible
+    expect(@server.ready_to_play?).to eq false
+    client1.enter_input('yes')
+    client2.enter_input('yes')
+    expect(@server.ready_to_play?).to eq true
+  end
+  # What other tests?
 end
