@@ -8,7 +8,6 @@ class Game
   def initialize
     @player_one = Player.new()
     @player_two = Player.new()
-    prizepool = []
     @game_winner = ''
   end
 
