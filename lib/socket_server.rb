@@ -2,7 +2,6 @@ require 'pry'
 require_relative 'game'
 
 class SocketServer
-  attr_reader :player_one, :player_two
   def initialize
     @games={}
     @pending_clients = []
@@ -20,7 +19,7 @@ class SocketServer
     @server = TCPServer.new(port_number)
   end
 
-  def accept_new_client(client)
+  def accept_new_client(client='Random Player')
     client_connection = [client , @server.accept_nonblock]
     @pending_clients.push(client_connection)
     if @pending_clients.size.odd?
@@ -37,8 +36,8 @@ class SocketServer
       game = Game.new()
       game.begin_game
       @games.store(game, @pending_clients.shift(2))
-      @games.values.last[0][1].puts "This war is ready to commence, are you ready to play?"
-      @games.values.last[1][1].puts "This war is ready to commence, are you ready to play?"
+
+      inform_clients_ready()
     else
       return false
     end
@@ -47,9 +46,14 @@ class SocketServer
   def ready_to_play?(delay=0.1, game_id)
     sleep(delay)
     responses = [@games.values[game_id][0][1].read_nonblock(1000).chomp, @games.values[game_id][1][1].read_nonblock(1000).chomp]
-    if responses[0] == 'yes' && responses[1] == 'yes'
-      true
+    if responses[0] == 'yes'
+      if responses[1] == 'yes'
+        true
+      else
+        false
+      end
     else
+      client if responses[1] == 'yes'
       false
     end
   rescue IO::WaitReadable
@@ -80,12 +84,38 @@ class SocketServer
     @games.keys[game]
   end
 
-  def setting_player_hand(game_id, cards, player)
+  def set_player_hand(game_id, cards, player)
     game = find_game(game_id)
     if player == 'Player One'
       game.player_one.set_hand(cards)
     else
       game.player_two.set_hand(cards)
     end
+  end
+
+  def run_game(game)
+    inform_clients_ready(game)
+    until winner? do
+      if ready_to_play(game)
+        result = game.run_round
+        inform_clients_result(game, result)
+      end
+    end
+    end_game(game)
+  end
+
+  def inform_clients_ready()
+    @games.values.last[0][1].puts "This war is ready to commence, are you ready to play?"
+    @games.values.last[1][1].puts "This war is ready to commence, are you ready to play?"
+  end
+
+  def winnner?(game)
+    game = @games.keys[game_id]
+    game.winner
+  end
+  def inform_clients_results(game, result)
+    @games.values.last[0][1].puts result
+    @games.values.last[1][1].puts result
+
   end
 end

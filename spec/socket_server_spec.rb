@@ -149,8 +149,8 @@ describe '#socket_server' do
       client2.take_in_output
       game_id = 0
       game = @server.find_game(game_id)
-      game.player_one.set_hand([PlayingCard.new("10", "Spades")])
-      game.player_two.set_hand([PlayingCard.new("4", "Clubs")])
+      @server.set_player_hand(game_id, [PlayingCard.new("10", "Spades")], 'Player One')
+      @server.set_player_hand(game_id, [PlayingCard.new("4", "Clubs")], 'Player Two')
       @server.run_round(game_id)
       expect(client1.take_in_output).to eq ("Player One took the 10 of Spades, and the 4 of Clubs!\n")
       expect(client2.take_in_output).to eq ("Player One took the 10 of Spades, and the 4 of Clubs!\n")
@@ -169,8 +169,8 @@ describe '#socket_server' do
       client1.enter_input('yes')
       client2.enter_input('yes')
        expect(@server.ready_to_play?(game_id)).to eq true
-      @server.setting_player_hand(game_id, [PlayingCard.new("Queen", "Diamonds")], 'Player One')
-      @server.setting_player_hand(game_id, [PlayingCard.new("Jack", "Spades")], 'Player Two')
+      @server.set_player_hand(game_id, [PlayingCard.new("Queen", "Diamonds"), PlayingCard.new("King", "Diamonds")], 'Player One')
+      @server.set_player_hand(game_id, [PlayingCard.new("Jack", "Spades"), PlayingCard.new("2", "Spades")], 'Player Two')
       @server.run_round(game_id)
        expect(client2.take_in_output).to eq ("Player One took the Queen of Diamonds, and the Jack of Spades!\n")
        expect(client1.take_in_output).to eq ("Player One took the Queen of Diamonds, and the Jack of Spades!\n")
@@ -178,12 +178,29 @@ describe '#socket_server' do
       client1.enter_input('yes')
       client2.enter_input('yes')
        expect(@server.ready_to_play?(game_id)).to eq true
-      @server.setting_player_hand(game_id, [PlayingCard.new("King", "Diamonds")], 'Player One')
-      @server.setting_player_hand(game_id,[PlayingCard.new("2", "Spades")], 'Player Two')
       @server.run_round(game_id)
        expect(client1.take_in_output).to eq ("Player One took the King of Diamonds, and the 2 of Spades!\n")
     end
     # Test winning the game possibly?
     # Test two games going on at the same time.
+    it 'should return are you ready? output' do
+      client1 = @clients[0]
+      client2 = @clients[1]
+      client1.take_in_output
+      @server.create_game_if_possible
+      expect(client1.take_in_output).to eq "This war is ready to commence, are you ready to play?\n"
+    end
+
+    it 'waits for input' do
+      client1 = @clients[0]
+      client2 = @clients[1]
+      game_id = 0
+      @server.create_game_if_possible
+      expect(@server.ready_to_play?(game_id)).to eq false
+      sleep(0.3)
+      client1.enter_input('yes')
+      client2.enter_input('yes')
+      expect(@server.ready_to_play?(game_id)).to eq true
+    end
   end
 end
