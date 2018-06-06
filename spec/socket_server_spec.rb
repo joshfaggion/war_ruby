@@ -202,5 +202,14 @@ describe '#socket_server' do
       client2.enter_input('yes')
       expect(@server.ready_to_play?(game_id)).to eq true
     end
+
+    it 'tests end game' do
+      @server.create_game_if_possible
+      client1 = @clients[0]
+      client1.take_in_output
+      game_id = 0
+      @server.end_game(game_id)
+      expect(client1.take_in_output).to eq ("The game has been completed!\n")
+    end
   end
 end

@@ -20,7 +20,7 @@ class SocketServer
   end
 
   def accept_new_client(client='Random Player')
-    client_connection = [client , @server.accept_nonblock]
+    client_connection = [client, @server.accept_nonblock]
     @pending_clients.push(client_connection)
     if @pending_clients.size.odd?
       client_connection[1].puts "Welcome, no other player is available to battle yet. We will continue to search."
@@ -29,6 +29,7 @@ class SocketServer
     end
   rescue IO::WaitReadable, Errno::EINTR
     puts "No client is available my lord!"
+    sleep(0.1)
   end
 
   def create_game_if_possible
@@ -36,7 +37,6 @@ class SocketServer
       game = Game.new()
       game.begin_game
       @games.store(game, @pending_clients.shift(2))
-
       inform_clients_ready()
     else
       return false
@@ -97,8 +97,8 @@ class SocketServer
     inform_clients_ready(game)
     until winner? do
       if ready_to_play(game)
-        result = game.run_round
-        inform_clients_result(game, result)
+        run_round
+        cards_in_hands
       end
     end
     end_game(game)
@@ -113,9 +113,11 @@ class SocketServer
     game = @games.keys[game_id]
     game.winner
   end
-  def inform_clients_results(game, result)
-    @games.values.last[0][1].puts result
-    @games.values.last[1][1].puts result
 
+  def end_game(game_id)
+    @games.values[game_id][0][1].puts "The game has been completed!"
+    @games.values[game_id][1][1].puts "The game has been completed!"
+    # Closing the clients
+    # Rematch?
   end
 end
