@@ -4,7 +4,7 @@ require 'pry'
 
 loop do
   begin
-  client = TCPSocket.new '192.168.0.5', 3000
+  client = TCPSocket.new 'localhost', 3000
   puts client.gets
   puts client.gets
   answer = ''
