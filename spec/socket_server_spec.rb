@@ -158,9 +158,9 @@ describe '#socket_server' do
       game = @server.create_game_if_possible
        expect(client1.take_in_output).to eq "Welcome, no other player is available to battle yet. We will continue to search. You are Player One.\n"
        expect(client2.take_in_output).to eq "Welcome, a player is available for you to fight! You are Player Two.\n"
-      @server.inform_clients_ready(game)
-       expect(client1.take_in_output).to eq "Are you ready to commence? Type yes and then enter to continue.\n"
-       expect(client2.take_in_output).to eq "Are you ready to commence? Type yes and then enter to continue.\n"
+      @server.ready_players_for_game(game)
+       expect(client1.take_in_output).to eq "The Game is starting... Are you ready?\n"
+       expect(client2.take_in_output).to eq "The Game is starting... Are you ready?\n"
       client1.enter_input('yes')
       client2.enter_input('yes')
        expect(@server.ready_to_play?(game)).to eq true
@@ -182,8 +182,8 @@ describe '#socket_server' do
       client2 = @clients[1]
       game = @server.create_game_if_possible
       client1.take_in_output
-      @server.inform_clients_ready(game)
-      expect(client1.take_in_output).to eq "Are you ready to commence? Type yes and then enter to continue.\n"
+      @server.ready_players_for_game(game)
+      expect(client1.take_in_output).to eq "The Game is starting... Are you ready?\n"
     end
 
     it 'waits for input' do
