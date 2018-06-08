@@ -12,14 +12,16 @@ loop do
     answer = gets
   end
   client.puts answer
+  puts "Waiting for opponent's response..."
   while true
     puts client.gets
-    answer = ''
+    # answer = ''
     until answer == "yes\n"
       answer = gets
      end
     client.puts answer
-    answer = ''
+    puts "Waiting for opponent's response..."
+    # answer = ''
     puts client.gets
     puts client.gets
   end

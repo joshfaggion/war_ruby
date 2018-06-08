@@ -46,17 +46,15 @@ class SocketServer
   def ready_to_play?(game)
     client1_input = ''
     client2_input = ''
-    until client1_input == "yes\n" && client2_input == "yes\n"
+    until client1_input.include?("yes") && client2_input.include?("yes")
       sleep(0.1)
-      if client1_input == ''
+      if client1_input.include?("yes") == false
         client1_input = take_in_output(game, 0)
       end
-      if client2_input == ''
+      if client2_input.include?("yes") == false
         client2_input = take_in_output(game, 1)
       end
     end
-    take_in_output(game, 0)
-    take_in_output(game, 1)
     true
   end
 
