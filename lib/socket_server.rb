@@ -8,7 +8,7 @@ class SocketServer
   end
 
   def port_number
-    2999
+    3000
   end
 
   def stop
@@ -20,16 +20,16 @@ class SocketServer
   end
 
   def accept_new_client(client='Random Player')
-    client_connection = [client, @server.accept_nonblock]
+    client_connection = @server.accept_nonblock
     @pending_clients.push(client_connection)
     if @pending_clients.size.odd?
-      client_connection[1].puts "Welcome, no other player is available to battle yet. We will continue to search."
+      client_connection.puts "Welcome, no other player is available to battle yet. We will continue to search. You are Player One."
     else
-      client_connection[1].puts "Welcome, a player is available for you to fight!"
+      client_connection.puts "Welcome, a player is available for you to fight! You are Player Two."
     end
   rescue IO::WaitReadable, Errno::EINTR
     puts "No client is available my lord!"
-    sleep(0.1)
+    sleep(2)
   end
 
   def create_game_if_possible
@@ -37,40 +37,39 @@ class SocketServer
       game = Game.new()
       game.begin_game
       @games.store(game, @pending_clients.shift(2))
-      inform_clients_ready()
+      return game
     else
       return false
     end
   end
 
-  def ready_to_play?(delay=0.1, game_id)
-    sleep(delay)
-    responses = [@games.values[game_id][0][1].read_nonblock(1000).chomp, @games.values[game_id][1][1].read_nonblock(1000).chomp]
-    if responses[0] == 'yes'
-      if responses[1] == 'yes'
-        true
-      else
-        false
+  def ready_to_play?(game)
+    client1_input = ''
+    client2_input = ''
+    until client1_input == "yes\n" && client2_input == "yes\n"
+      sleep(0.1)
+      if client1_input == ''
+        client1_input = take_in_output(game, 0)
       end
-    else
-      client if responses[1] == 'yes'
-      false
+      if client2_input == ''
+        client2_input = take_in_output(game, 1)
+      end
     end
-  rescue IO::WaitReadable
-    return false
+    take_in_output(game, 0)
+    take_in_output(game, 1)
+    true
   end
-  def cards_in_hands(game_id)
-    # Fill with code.
-    game = @games.keys[game_id]
-    first_client = @games.values[game_id][0][1]
-    second_client = @games.values[game_id][1][1]
+
+  def cards_in_hands(game)
+    first_client = @games[game][0]
+    second_client = @games[game][1]
     first_client.puts "You have #{game.player_one.cards_left} cards left in your hand."
     second_client.puts "You have #{game.player_two.cards_left} cards left in your hand."
   end
-  def run_round(game_id)
-    game = @games.keys[game_id]
-    first_client = @games.values[game_id][0][1]
-    second_client = @games.values[game_id][1][1]
+
+  def run_round(game)
+    first_client = @games[game][0]
+    second_client = @games[game][1]
     results = game.run_round(false)
     first_client.puts results
     second_client.puts results
@@ -94,30 +93,47 @@ class SocketServer
   end
 
   def run_game(game)
-    inform_clients_ready(game)
-    until winner? do
-      if ready_to_play(game)
-        run_round
-        cards_in_hands
-      end
+    game_id = @games.keys.index(game)
+    ready_players_for_game(game)
+    ready_to_play?(game)
+    until winner?(game)
+      ready_players_for_round(game)
+      ready_to_play?(game)
+      run_round(game)
+      cards_in_hands(game)
     end
     end_game(game)
   end
 
-  def inform_clients_ready()
-    @games.values.last[0][1].puts "This war is ready to commence, are you ready to play?"
-    @games.values.last[1][1].puts "This war is ready to commence, are you ready to play?"
+  def ready_players_for_round(game)
+    @games[game][0].puts "Are you ready to start the round? Type yes and then enter to continue."
+    @games[game][1].puts "Are you ready to start the round? Type yes and then enter to continue."
+  end
+  def ready_players_for_game(game)
+    @games[game][0].puts "The Game is starting... Are you ready?"
+    @games[game][1].puts "The Game is starting... Are you ready?"
   end
 
-  def winnner?(game)
-    game = @games.keys[game_id]
+  def winner?(game)
     game.winner
   end
 
   def end_game(game_id)
-    @games.values[game_id][0][1].puts "The game has been completed!"
-    @games.values[game_id][1][1].puts "The game has been completed!"
+    @games.values[game_id][0].puts "The game has been completed!"
+    @games.values[game_id][1].puts "The game has been completed!"
     # Closing the clients
     # Rematch?
+  end
+
+  private
+
+  def take_in_output(game, chosen_client)
+    sleep(0.1)
+    output = ""
+    client = @games[game][chosen_client]
+    output = client.read_nonblock(1000)
+    return output
+  rescue IO::WaitReadable
+    output=''
   end
 end
