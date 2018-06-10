@@ -143,9 +143,8 @@ describe '#socket_server' do
       game = @server.create_game_if_possible
       client1.take_in_output
       client2.take_in_output
-      game_id = 0
-      @server.set_player_hand(game_id, [PlayingCard.new("10", "Spades")], 'Player One')
-      @server.set_player_hand(game_id, [PlayingCard.new("4", "Clubs")], 'Player Two')
+      @server.set_player_hand(game, [PlayingCard.new("10", "Spades")], 'Player One')
+      @server.set_player_hand(game, [PlayingCard.new("4", "Clubs")], 'Player Two')
       @server.run_round(game)
       expect(client1.take_in_output).to eq ("Player One took the 10 of Spades, and the 4 of Clubs!\n")
       expect(client2.take_in_output).to eq ("Player One took the 10 of Spades, and the 4 of Clubs!\n")
@@ -154,7 +153,6 @@ describe '#socket_server' do
     it 'should run every part up to the second round' do
       client1 = @clients[0]
       client2 = @clients[1]
-      game_id = 0
       game = @server.create_game_if_possible
        expect(client1.take_in_output).to eq "Welcome, no other player is available to battle yet. We will continue to search. You are Player One.\n"
        expect(client2.take_in_output).to eq "Welcome, a player is available for you to fight! You are Player Two.\n"
@@ -164,8 +162,8 @@ describe '#socket_server' do
       client1.enter_input('yes')
       client2.enter_input('yes')
        expect(@server.ready_to_play?(game)).to eq true
-      @server.set_player_hand(game_id, [PlayingCard.new("Queen", "Diamonds"), PlayingCard.new("King", "Diamonds")], 'Player One')
-      @server.set_player_hand(game_id, [PlayingCard.new("Jack", "Spades"), PlayingCard.new("2", "Spades")], 'Player Two')
+      @server.set_player_hand(game, [PlayingCard.new("Queen", "Diamonds"), PlayingCard.new("King", "Diamonds")], 'Player One')
+      @server.set_player_hand(game, [PlayingCard.new("Jack", "Spades"), PlayingCard.new("2", "Spades")], 'Player Two')
       @server.run_round(game)
        expect(client2.take_in_output).to eq ("Player One took the Queen of Diamonds, and the Jack of Spades!\n")
        expect(client1.take_in_output).to eq ("Player One took the Queen of Diamonds, and the Jack of Spades!\n")
@@ -199,12 +197,12 @@ describe '#socket_server' do
     end
 
     it 'tests end game' do
-      @server.create_game_if_possible
+      game = @server.create_game_if_possible
       client1 = @clients[0]
-      game_id = 0
       client1.take_in_output
-      @server.end_game(game_id)
+      @server.end_game(game)
       expect(client1.take_in_output).to eq ("The game has been completed!\n")
+      expect(@server.number_of_games).to eq 0
     end
   end
 end

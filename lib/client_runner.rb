@@ -1,5 +1,6 @@
 require 'socket'
 
+quit_game = false
 
 loop do
   begin
@@ -8,13 +9,24 @@ loop do
   puts client.gets
   answer = ''
   until answer == "yes\n"
-    answer = gets
+    answer = gets.downcase
   end
   client.puts answer
   puts "Waiting for opponent's response..."
   while true
-    puts client.gets
+    question = client.gets
+    puts question
     answer = ''
+    if question == "The game has been completed!\n"
+      puts "Do you want to play again?"
+      answer = gets.downcase
+      if answer == "yes\n"
+        break
+      else
+        quit_game = true
+        break
+      end
+    end
     until answer == "yes\n"
       answer = gets
      end
@@ -27,18 +39,12 @@ loop do
   rescue Errno::ECONNREFUSED
     puts "Waiting for server to start..."
     sleep(2)
+  rescue Errno::EPIPE
+    puts "We are having trouble with our server, but we will automatically try to connect, just sit back and relax."
+  rescue Errno::ECONNRESET
+    puts "Sorry, you are disconnected. The game you were playing is gone."
+  end
+  if quit_game == true
+    break
   end
 end
-
-#  def run_game(game)
-#     game_id = @games.keys.index(game)
-#     inform_clients_ready(game)
-#     until winner?(game)
-#       ready_to_play?(game)
-#       run_round(game_id)
-#       cards_in_hands(game)
-#       inform_clients_ready(game)
-#       end
-#     end
-#     end_game(game)
-#   end

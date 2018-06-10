@@ -81,8 +81,7 @@ class SocketServer
     @games.keys[game]
   end
 
-  def set_player_hand(game_id, cards, player)
-    game = find_game(game_id)
+  def set_player_hand(game, cards, player)
     if player == 'Player One'
       game.player_one.set_hand(cards)
     else
@@ -116,11 +115,14 @@ class SocketServer
     game.winner
   end
 
-  def end_game(game_id)
-    @games.values[game_id][0].puts "The game has been completed!"
-    @games.values[game_id][1].puts "The game has been completed!"
-    # Closing the clients
-    # Rematch?
+  def end_game(game)
+    @games[game][0].puts "The game has been completed!"
+    @games[game][1].puts "The game has been completed!"
+    client1 = @games[game][0]
+    client2 = @games[game][1]
+    client1.close
+    client2.close
+    @games.reject! {|k| k == game}
   end
 
   private
