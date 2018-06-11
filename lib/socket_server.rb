@@ -28,15 +28,14 @@ class SocketServer
       client_connection.puts "Welcome, a player is available for you to fight! You are Player Two."
     end
   rescue IO::WaitReadable, Errno::EINTR
-    puts "No client is available my lord!"
-    sleep(2)
+    sleep(0.1)
   end
 
   def create_game_if_possible
     if @pending_clients.size > 1
       game = Game.new()
       game.begin_game
-      @games.store(game, @pending_clients.shift(2))
+      games.store(game, @pending_clients.shift(2))
       return game
     else
       return false
@@ -59,26 +58,26 @@ class SocketServer
   end
 
   def cards_in_hands(game)
-    first_client = @games[game][0]
-    second_client = @games[game][1]
+    first_client = games[game][0]
+    second_client = games[game][1]
     first_client.puts "You have #{game.player_one.cards_left} cards left in your hand."
     second_client.puts "You have #{game.player_two.cards_left} cards left in your hand."
   end
 
   def run_round(game)
-    first_client = @games[game][0]
-    second_client = @games[game][1]
+    first_client = games[game][0]
+    second_client = games[game][1]
     results = game.run_round(false)
     first_client.puts results
     second_client.puts results
   end
 
   def number_of_games
-    @games.keys.count
+    games.keys.count
   end
 
   def find_game(game)
-    @games.keys[game]
+    games.keys[game]
   end
 
   def set_player_hand(game, cards, player)
@@ -90,7 +89,6 @@ class SocketServer
   end
 
   def run_game(game)
-    game_id = @games.keys.index(game)
     ready_players_for_game(game)
     ready_to_play?(game)
     until winner?(game)
@@ -103,12 +101,14 @@ class SocketServer
   end
 
   def ready_players_for_round(game)
-    @games[game][0].puts "Are you ready to start the round? Type yes and then enter to continue."
-    @games[game][1].puts "Are you ready to start the round? Type yes and then enter to continue."
+    ready_message = "Are you ready to start the round? Type yes and then enter to continue."
+    games[game][0].puts ready_message
+    games[game][1].puts ready_message
   end
   def ready_players_for_game(game)
-    @games[game][0].puts "The Game is starting... Are you ready?"
-    @games[game][1].puts "The Game is starting... Are you ready?"
+    game_message = "The Game is starting... Are you ready?"
+    games[game][0].puts game_message
+    games[game][1].puts game_message
   end
 
   def winner?(game)
@@ -116,13 +116,14 @@ class SocketServer
   end
 
   def end_game(game)
-    @games[game][0].puts "The game has been completed!"
-    @games[game][1].puts "The game has been completed!"
-    client1 = @games[game][0]
-    client2 = @games[game][1]
+    complete_message = "The game has been completed!"
+    games[game][0].puts complete_message
+    games[game][1].puts complete_message
+    client1 = games[game][0]
+    client2 = games[game][1]
     client1.close
     client2.close
-    @games.reject! {|k| k == game}
+    games.reject! {|k| k == game}
   end
 
   private
@@ -130,10 +131,13 @@ class SocketServer
   def take_in_output(game, chosen_client)
     sleep(0.1)
     output = ""
-    client = @games[game][chosen_client]
+    client = games[game][chosen_client]
     output = client.read_nonblock(1000)
     return output
   rescue IO::WaitReadable
     output=''
+  end
+  def games
+    @games
   end
 end
