@@ -72,7 +72,7 @@ describe '#socket_server' do
   it 'should say the game is not ready to be played until set to be ready' do
     @server.start
     client1 = MockSocketClient.new(@server.port_number)
-      @server.accept_new_client("Player 1")
+    @server.accept_new_client("Player 1")
     @clients.push(client1)
     client2 = MockSocketClient.new(@server.port_number)
     @server.accept_new_client("Player 2")

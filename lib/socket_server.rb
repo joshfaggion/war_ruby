@@ -65,7 +65,7 @@ class SocketServer
   end
 
   def run_round(game)
-    first_client = games[game][0]
+    first_client = gamrs[game][0]
     second_client = games[game][1]
     results = game.run_round(false)
     first_client.puts results

@@ -20,7 +20,7 @@ describe '#card_deck?' do
     expect(deck.cards_left).to(eq(51))
   end
 
-  it('should change the location of the first item') do
+  it('should shuffle the deck') do
     deck = CardDeck.new()
     deck.shuffle()
     cards = []
